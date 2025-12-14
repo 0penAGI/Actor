@@ -1,4 +1,8 @@
-import { pipeline } from '@xenova/transformers';
+import { env, pipeline } from '@xenova/transformers';
+
+/* === CRITICAL FOR APIFY === */
+env.allowLocalModels = false;
+env.useBrowserCache = false;
 
 let embedder = null;
 
@@ -14,7 +18,10 @@ export async function getEmbedder() {
 
 export async function embedText(text) {
     const model = await getEmbedder();
-    const output = await model(text, { pooling: 'mean', normalize: true });
+    const output = await model(text, {
+        pooling: 'mean',
+        normalize: true,
+    });
     return Array.from(output.data);
 }
 
@@ -25,5 +32,5 @@ export function cosineDistance(a, b) {
         na += a[i] * a[i];
         nb += b[i] * b[i];
     }
-    return 1 - (dot / (Math.sqrt(na) * Math.sqrt(nb)));
+    return 1 - dot / (Math.sqrt(na) * Math.sqrt(nb));
 }
