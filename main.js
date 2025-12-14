@@ -1,5 +1,6 @@
 import { Actor } from 'apify';
-import { chromium } from 'playwright';
+const browser = await Actor.launchPlaywright();
+const page = await browser.newPage();
 import { embedText, cosineDistance } from './src/embedding.js';
 import { loadPrevious, saveCurrent } from './src/storage.js';
 import { classifyShift } from './src/classify.js';
