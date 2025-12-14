@@ -1,17 +1,19 @@
 import { Actor } from 'apify';
 
 export async function classifyShift(oldText, newText) {
+    const client = Actor.newClient();
+
     const prompt = `
 You are an SEO analyst.
-Analyze semantic shift between two versions of a webpage text.
+Analyze semantic shift between two webpage texts.
 
-Old version:
+Old:
 "${oldText}"
 
-New version:
+New:
 "${newText}"
 
-Classify the shift using ONE category:
+Choose ONE:
 - premium positioning
 - conversion push
 - trust & authority
@@ -19,16 +21,14 @@ Classify the shift using ONE category:
 - informational expansion
 - unclear / minor change
 
-Then give a 2–3 sentence human-readable summary.
+Then give a 2–3 sentence summary.
 `;
 
-    const client = Actor.newClient();
-    const response = await client.openai.chat.completions.create({
+    const res = await client.openai.chat.completions.create({
         model: 'gpt-4o-mini',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.2,
     });
 
-    return response.choices[0].message.content;
+    return res.choices[0].message.content;
 }
-
