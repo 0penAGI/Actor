@@ -3,29 +3,31 @@ import { embedText, cosineDistance } from './src/embedding.js';
 import { loadPrevious, saveCurrent } from './src/storage.js';
 import { classifyShift } from './src/classify.js';
 
+/* === HARD SAFETY NET === */
 process.on('uncaughtException', err => {
     console.error('UNCAUGHT EXCEPTION:', err);
-    process.exit(1);
+});
+process.on('unhandledRejection', err => {
+    console.error('UNHANDLED REJECTION:', err);
 });
 
 Actor.main(async () => {
     Actor.log.info('SEO Semantic Shift Monitor v1 starting');
 
-    const input = await Actor.getInput() || {};
+    const input = (await Actor.getInput()) || {};
     const {
         target_urls = [],
         text_selectors = [],
         shift_threshold = 0.1,
     } = input;
 
-    const hasOpenAI = !!process.env.OPENAI_API_KEY;
+    const hasOpenAI = Boolean(process.env.OPENAI_API_KEY);
     if (!hasOpenAI) {
-        Actor.log.warning('OPENAI_API_KEY not found — semantic interpretation disabled');
+        Actor.log.warning('OPENAI_API_KEY not found — interpretation disabled');
     }
 
     const browser = await Actor.launchPlaywright();
     const page = await browser.newPage();
-
     const results = [];
 
     for (const url of target_urls) {
@@ -64,7 +66,7 @@ Actor.main(async () => {
                             : 'unclassified (no LLM)',
                         human_summary: interpretation
                             ? interpretation
-                            : 'Semantic drift detected, but no OpenAI API key provided for interpretation.',
+                            : 'Semantic drift detected. No OpenAI key provided.',
                     });
                 }
             }
