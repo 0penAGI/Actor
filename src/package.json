@@ -2,5 +2,8 @@
   "name": "seo-semantic-shift-monitor",
   "version": "1.0.0",
   "type": "module",
+  "dependencies": {
+    "apify": "^3.0.0",
+    "@xenova/transformers": "^2.7.0"
   }
 }
